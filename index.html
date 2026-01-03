@@ -1,10 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>my github cms index file</title>
+    <meta charset="UTF-8">
+    <title>My CMS Portfolio Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
 </head>
 <body>
-    <h1>Hello, FHIR</h1>
-    <p>This is my first app</p>
+    <h1>Patient Dashboard Prototype</h1>
+    <div id="patient-name">Loading...</div>
+    <hr>
+    <h3>Vitals (Recent)</h3>
+    <ul id="vitals-list"></ul>
+
+    <script>
+        // 1. Configuration
+        const config = {
+            clientId: "YOUR_NON_PROD_CLIENT_ID_HERE", // Paste your Epic Client ID here
+            scope: "openid fhirUser patient/Patient.read patient/Observation.read",
+            iss: "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4/",
+            redirectUri: window.location.origin + window.location.pathname
+        };
+
+        // 2. The Logic
+        FHIR.oauth2.ready()
+            .then(client => {
+                // Fetch Patient Name
+                client.request(`Patient/${client.patient.id}`)
+                    .then(patient => {
+                        const name = patient.name[0].given.join(" ") + " " + patient.name[0].family;
+                        document.getElementById('patient-name').innerText = "Patient: " + name;
+                    });
+
+                // Fetch Vitals (Observations)
+                client.request(`Observation?patient=${client.patient.id}&category=vital-signs`)
+                    .then(data => {
+                        const list = document.getElementById('vitals-list');
+                        data.entry.forEach(item => {
+                            const obs = item.resource;
+                            const li = document.createElement('li');
+                            li.innerText = `${obs.code.text}: ${obs.valueQuantity.value} ${obs.valueQuantity.unit}`;
+                            list.appendChild(li);
+                        });
+                    });
+            })
+            .catch(() => {
+                // If not authorized, start the login flow
+                FHIR.oauth2.authorize(config);
+            });
+    </script>
 </body>
 </html>
