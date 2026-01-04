@@ -1,4 +1,8 @@
-// sw.js - A simple "Empty" Service Worker
-self.addEventListener('fetch', function(event) {
-  // This satisfies the "Fetch Handler" requirement
+// sw.js
+self.addEventListener('install', (event) => {
+  console.log('SW Installed');
+});
+
+self.addEventListener('fetch', (event) => {
+  // Even an empty fetch handler satisfies the browser's requirement
 });
