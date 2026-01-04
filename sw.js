@@ -1,8 +1,8 @@
-// sw.js
 self.addEventListener('install', (event) => {
-  console.log('SW Installed');
+  console.log('SW installed');
 });
 
+// CRITICAL: Chrome needs to see a 'fetch' listener to enable the Install button
 self.addEventListener('fetch', (event) => {
-  // Even an empty fetch handler satisfies the browser's requirement
+  event.respondWith(fetch(event.request));
 });
