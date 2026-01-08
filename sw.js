@@ -1,13 +1,17 @@
+// sw.js
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // 1. If this is a login redirect from Epic, ALWAYS use the network
+  // CRITICAL: If the URL contains 'code=' or 'state=', 
+  // skip the cache entirely and go to the real internet.
   if (url.searchParams.has('code') || url.searchParams.has('state')) {
-    return; // This lets the browser handle the request normally
+    return; // Do nothing; let the browser handle it normally
   }
 
-  // 2. Otherwise, use your standard caching strategy
+  // Normal caching for everything else (images, css, etc.)
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
   );
 });
