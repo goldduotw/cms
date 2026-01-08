@@ -41,6 +41,33 @@
                             const obs = item.resource;
                             const li = document.createElement('li');
                         
+                            // 1. Get the Name safely
+                            const name = obs.code?.text || (obs.code?.coding && obs.code.coding[0]?.display) || "Observation";
+                        
+                            // 2. Check for "Complex" data (like Blood Pressure)
+                            if (obs.component) {
+                                const parts = obs.component.map(c => {
+                                    const compName = c.code?.text || (c.code?.coding && c.code.coding[0]?.display) || "";
+                                    const compVal = c.valueQuantity?.value || "N/A";
+                                    const compUnit = c.valueQuantity?.unit || "";
+                                    return `${compName}: ${compVal} ${compUnit}`;
+                                });
+                                li.innerText = `${name} -> ${parts.join(" | ")}`;
+                            } 
+                            // 3. Check for "Simple" data (like Weight/Height)
+                            else {
+                                const value = obs.valueQuantity?.value ?? obs.valueString ?? "N/A";
+                                const unit = obs.valueQuantity?.unit || "";
+                                li.innerText = `${name}: ${value} ${unit}`;
+                            }
+                        
+                            list.appendChild(li);
+                        });
+                        /*
+                        data.entry.forEach(item => {
+                            const obs = item.resource;
+                            const li = document.createElement('li');
+                        
                             // 1. Safely get the Name (use 'code.text' OR 'code.coding[0].display')
                             const name = (obs.code?.text || (obs.code?.coding && obs.code.coding[0]?.display) || "Unknown");
                         
@@ -51,13 +78,8 @@
                         
                             li.innerText = `${name}: ${value} ${unit}`;
                             list.appendChild(li);
-                            /*
-                            const obs = item.resource;
-                            const li = document.createElement('li');
-                            li.innerText = `${obs.code.text? || "N/A"}: ${obs.valueQuantity.value} ${obs.valueQuantity.unit}`;
-                            list.appendChild(li);
-                            */
                         });
+                        */
                     });
             })
             .catch(() => {
