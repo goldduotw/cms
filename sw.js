@@ -1,9 +1,13 @@
-self.addEventListener('install', (event) => {
-  // Forces the waiting service worker to become the active one immediately
-  self.skipWaiting(); 
-});
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
 
-self.addEventListener('activate', (event) => {
-  // Ensures the SW takes control of the page immediately without needing a reload
-  event.waitUntil(clients.claim()); 
+  // 1. If this is a login redirect from Epic, ALWAYS use the network
+  if (url.searchParams.has('code') || url.searchParams.has('state')) {
+    return; // This lets the browser handle the request normally
+  }
+
+  // 2. Otherwise, use your standard caching strategy
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
 });
