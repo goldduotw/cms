@@ -1,13 +1,9 @@
 self.addEventListener('install', (event) => {
-  console.log('SW installed');
+  // Forces the waiting service worker to become the active one immediately
+  self.skipWaiting(); 
 });
 
-// CRITICAL: Chrome needs to see a 'fetch' listener to enable the Install button
-self.addEventListener('fetch', (event) => {
-// If the URL has Epic's login code, don't use the cache!
-  if (event.request.url.includes('code=')) {
-    return fetch(event.request);
-  }
-  // Otherwise, do the normal stuff
-  event.respondWith(fetch(event.request));
+self.addEventListener('activate', (event) => {
+  // Ensures the SW takes control of the page immediately without needing a reload
+  event.waitUntil(clients.claim()); 
 });
