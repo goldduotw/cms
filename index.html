@@ -40,7 +40,7 @@
                         data.entry.forEach(item => {
                             const obs = item.resource;
                             const li = document.createElement('li');
-                            li.innerText = `${obs.code.text}: ${obs.valueQuantity.value} ${obs.valueQuantity.unit}`;
+                            li.innerText = `${obs.code.text?.text || "N/A"}: ${obs.valueQuantity.value} ${obs.valueQuantity.unit}`;
                             list.appendChild(li);
                         });
                     });
