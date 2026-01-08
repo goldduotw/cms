@@ -68,40 +68,17 @@
                                 const unit = obs.valueQuantity?.unit || "";
                                 
                              //   li.innerHTML = `<strong>${name}</strong>: ${value} ${unit}`;
-                                const date = obs.effectiveDateTime ? new Date(obs.effectiveDateTime).toLocaleDateString() : "No Date";
-                                li.innerHTML = `<strong>[${date}] ${name}</strong>: ${displayValue} ${unit}`;
+                                // This checks the three most common places Epic hides the date
+                                const rawDate = obs.effectiveDateTime || obs.issued || (obs.effectivePeriod && obs.effectivePeriod.start);
+                                const dateLabel = rawDate ? new Date(rawDate).toLocaleDateString() : "No Date";
+                                li.innerHTML = `<strong>[${dateLabel}] ${name}</strong>: ${displayValue} ${unit}`;
+                             //   const date = obs.effectiveDateTime ? new Date(obs.effectiveDateTime).toLocaleDateString() : "No Date";
+                             //   li.innerHTML = `<strong>[${date}] ${name}</strong>: ${displayValue} ${unit}`;
                             }
                         
                             list.appendChild(li);
                         });
-                        /*
-                        data.entry.forEach(item => {
-                            const obs = item.resource;
-                            const li = document.createElement('li');
-                        
-                            // 1. Get the Name safely
-                            const name = obs.code?.text || (obs.code?.coding && obs.code.coding[0]?.display) || "Observation";
-                        
-                            // 2. Check for "Complex" data (like Blood Pressure)
-                            if (obs.component) {
-                                const parts = obs.component.map(c => {
-                                    const compName = c.code?.text || (c.code?.coding && c.code.coding[0]?.display) || "";
-                                    const compVal = c.valueQuantity?.value || "N/A";
-                                    const compUnit = c.valueQuantity?.unit || "";
-                                    return `${compName}: ${compVal} ${compUnit}`;
-                                });
-                                li.innerText = `${name} -> ${parts.join(" | ")}`;
-                            } 
-                            // 3. Check for "Simple" data (like Weight/Height)
-                            else {
-                                const value = obs.valueQuantity?.value ?? obs.valueString ?? "N/A";
-                                const unit = obs.valueQuantity?.unit || "";
-                                li.innerText = `${name}: ${value} ${unit}`;
-                            }
-                        
-                            list.appendChild(li);
-                        });
-                        */
+
                     });
             })
             .catch(() => {
