@@ -40,8 +40,23 @@
                         data.entry.forEach(item => {
                             const obs = item.resource;
                             const li = document.createElement('li');
+                        
+                            // 1. Safely get the Name (use 'code.text' OR 'code.coding[0].display')
+                            const name = obs.code?.text || obs.code?.coding?.[0]?.display || "Unknown Observation";
+                        
+                            // 2. Safely get the Value and Unit
+                            // Jason often has observations without 'valueQuantity' (like smoking status)
+                            const value = obs.valueQuantity?.value ?? obs.valueString ?? obs.valueCodeableConcept?.text ?? "No Value";
+                            const unit = obs.valueQuantity?.unit || "";
+                        
+                            li.innerText = `${name}: ${value} ${unit}`;
+                            list.appendChild(li);
+                            /*
+                            const obs = item.resource;
+                            const li = document.createElement('li');
                             li.innerText = `${obs.code.text? || "N/A"}: ${obs.valueQuantity.value} ${obs.valueQuantity.unit}`;
                             list.appendChild(li);
+                            */
                         });
                     });
             })
