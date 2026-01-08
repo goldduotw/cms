@@ -39,6 +39,42 @@
                         const list = document.getElementById('vitals-list');
                         data.entry.forEach(item => {
                             const obs = item.resource;
+                            if (!obs) return;
+                        
+                            const li = document.createElement('li');
+                        
+                            // 1. Get the Name (Epic often hides it in coding[0].display)
+                            const name = obs.code?.text || 
+                                         obs.code?.coding?.[0]?.display || 
+                                         "Observation";
+                        
+                            // 2. Handle Complex Vitals (like Blood Pressure)
+                            if (obs.component && obs.component.length > 0) {
+                                const componentData = obs.component.map(comp => {
+                                    const cName = comp.code?.text || comp.code?.coding?.[0]?.display || "";
+                                    const cValue = comp.valueQuantity?.value ?? "N/A";
+                                    const cUnit = comp.valueQuantity?.unit || "";
+                                    return `${cName}: ${cValue}${cUnit}`;
+                                }).join(" / ");
+                                
+                                li.innerHTML = `<strong>${name}</strong>: ${componentData}`;
+                            } 
+                            // 3. Handle Simple Vitals (Height, Weight, Temp)
+                            else {
+                                const value = obs.valueQuantity?.value ?? 
+                                              obs.valueString ?? 
+                                              obs.valueCodeableConcept?.text ?? 
+                                              "No Data";
+                                const unit = obs.valueQuantity?.unit || "";
+                                
+                                li.innerHTML = `<strong>${name}</strong>: ${value} ${unit}`;
+                            }
+                        
+                            list.appendChild(li);
+                        });
+                        /*
+                        data.entry.forEach(item => {
+                            const obs = item.resource;
                             const li = document.createElement('li');
                         
                             // 1. Get the Name safely
@@ -61,22 +97,6 @@
                                 li.innerText = `${name}: ${value} ${unit}`;
                             }
                         
-                            list.appendChild(li);
-                        });
-                        /*
-                        data.entry.forEach(item => {
-                            const obs = item.resource;
-                            const li = document.createElement('li');
-                        
-                            // 1. Safely get the Name (use 'code.text' OR 'code.coding[0].display')
-                            const name = (obs.code?.text || (obs.code?.coding && obs.code.coding[0]?.display) || "Unknown");
-                        
-                            // 2. Safely get the Value and Unit
-                            // Jason often has observations without 'valueQuantity' (like smoking status)
-                            const value = (obs.valueQuantity?.value ?? obs.valueString ?? "No Value");
-                            const unit = obs.valueQuantity?.unit || "";
-                        
-                            li.innerText = `${name}: ${value} ${unit}`;
                             list.appendChild(li);
                         });
                         */
