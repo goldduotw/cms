@@ -42,11 +42,11 @@
                             const li = document.createElement('li');
                         
                             // 1. Safely get the Name (use 'code.text' OR 'code.coding[0].display')
-                            const name = obs.code?.text || obs.code?.coding?.[0]?.display || "Unknown Observation";
+                            const name = (obs.code?.text || (obs.code?.coding && obs.code.coding[0]?.display) || "Unknown");
                         
                             // 2. Safely get the Value and Unit
                             // Jason often has observations without 'valueQuantity' (like smoking status)
-                            const value = obs.valueQuantity?.value ?? obs.valueString ?? obs.valueCodeableConcept?.text ?? "No Value";
+                            const value = (obs.valueQuantity?.value ?? obs.valueString ?? "No Value");
                             const unit = obs.valueQuantity?.unit || "";
                         
                             li.innerText = `${name}: ${value} ${unit}`;
