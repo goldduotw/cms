@@ -78,7 +78,14 @@ data.entry.forEach(item => {
     li.innerHTML = `<strong>[${dateLabel}] ${name}</strong>: ${displayValue} ${unit}`;
     list.appendChild(li);
 });
-drawChart(weightLabels.reverse(), weightValues.reverse());
+                        
+const canvas = document.getElementById('weightChart');
+if (canvas && weightValues.length > 0) {
+    drawChart(weightLabels.reverse(), weightValues.reverse());
+} else {
+    console.log("Canvas not found or no weight data to graph.");
+}                       
+//drawChart(weightLabels.reverse(), weightValues.reverse());
                     });
             })
             .catch(() => {
