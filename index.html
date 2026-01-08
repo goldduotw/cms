@@ -34,7 +34,7 @@
                     });
 
                 // Fetch Vitals (Observations)
-                client.request(`Observation?patient=${client.patient.id}`)
+                client.request(`Observation?patient=${client.patient.id}&category=laboratory,vital-signs`)
                     .then(data => {
                         const list = document.getElementById('vitals-list');
                         data.entry.forEach(item => {
