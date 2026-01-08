@@ -51,7 +51,6 @@ data.entry.forEach(item => {
     const rawDate = obs.effectiveDateTime || obs.issued || (obs.effectivePeriod && obs.effectivePeriod.start);
     const dateLabel = rawDate ? new Date(rawDate).toLocaleDateString() : "No Date";
 
-    let displayValue = "No Data";
     // 2. Now fill the variable based on the data type
     if (obs.component) {
         displayValue = obs.component.map(c => {
