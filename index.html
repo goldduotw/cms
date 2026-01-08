@@ -6,8 +6,10 @@
     <title>My CMS Portfolio Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
     <link rel="manifest" href="./manifest.webmanifest">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <canvas id="weightChart" width="400" height="200"></canvas>
     <h1>Patient Dashboard Prototype</h1>
     <div id="patient-name">Loading...</div>
     <hr>
@@ -49,11 +51,7 @@ data.entry.forEach(item => {
     const rawDate = obs.effectiveDateTime || obs.issued || (obs.effectivePeriod && obs.effectivePeriod.start);
     const dateLabel = rawDate ? new Date(rawDate).toLocaleDateString() : "No Date";
 
-    if (name.toLowerCase().includes("weight")) {
-        weightLabels.push(dateLabel); // The date
-        weightValues.push(parseFloat(displayValue)); // The number
-    }
-    
+    let displayValue = "No Data";
     // 2. Now fill the variable based on the data type
     if (obs.component) {
         displayValue = obs.component.map(c => {
@@ -69,6 +67,11 @@ data.entry.forEach(item => {
     }
 
     const unit = obs.valueQuantity?.unit || "";
+
+    if (name.toLowerCase().includes("weight")) {
+        weightLabels.push(dateLabel); // The date
+        weightValues.push(parseFloat(displayValue)); // The number
+    }
 
     // 3. Now this line will work because displayValue is "in scope"
     const li = document.createElement('li');
