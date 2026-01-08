@@ -67,7 +67,9 @@
                                               "No Data";
                                 const unit = obs.valueQuantity?.unit || "";
                                 
-                                li.innerHTML = `<strong>${name}</strong>: ${value} ${unit}`;
+                             //   li.innerHTML = `<strong>${name}</strong>: ${value} ${unit}`;
+                                const date = obs.effectiveDateTime ? new Date(obs.effectiveDateTime).toLocaleDateString() : "No Date";
+                                li.innerHTML = `<strong>[${date}] ${name}</strong>: ${displayValue} ${unit}`;
                             }
                         
                             list.appendChild(li);
