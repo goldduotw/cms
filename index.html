@@ -41,6 +41,37 @@
                             const obs = item.resource;
                             if (!obs) return;
                         
+                            // 1. Extract the Date
+                            const rawDate = obs.effectiveDateTime || obs.issued || (obs.effectivePeriod && obs.effectivePeriod.start);
+                            const dateLabel = rawDate ? new Date(rawDate).toLocaleDateString() : "No Date";
+                        
+                            // 2. Get the Name
+                            const name = obs.code?.text || obs.code?.coding?.[0]?.display || "Observation";
+                        
+                            let displayValue = "";
+                            
+                            // 3. Handle Values (using the "Universal" logic from before)
+                            if (obs.component) {
+                                displayValue = obs.component.map(c => {
+                                    const val = c.valueQuantity?.value || "N/A";
+                                    return `${val}`;
+                                }).join("/");
+                            } else {
+                                displayValue = obs.valueQuantity?.value || obs.valueString || "N/A";
+                            }
+                        
+                            const unit = obs.valueQuantity?.unit || "";
+                        
+                            // 4. THE FIX: Use the dateLabel here!
+                            const li = document.createElement('li');
+                            li.innerHTML = `<strong>[${dateLabel}] ${name}</strong>: ${displayValue} ${unit}`;
+                            list.appendChild(li);
+                        });
+                        /*
+                        data.entry.forEach(item => {
+                            const obs = item.resource;
+                            if (!obs) return;
+                        
                             const li = document.createElement('li');
                         
                             // 1. Get the Name (Epic often hides it in coding[0].display)
@@ -78,7 +109,7 @@
                         
                             list.appendChild(li);
                         });
-
+                        */
                     });
             })
             .catch(() => {
