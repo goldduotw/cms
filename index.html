@@ -37,36 +37,37 @@
                 client.request(`Observation?patient=${client.patient.id}&category=vital-signs,laboratory,social-history,core-characteristics`)
                     .then(data => {
                         const list = document.getElementById('vitals-list');
-                        data.entry.forEach(item => {
-                            const obs = item.resource;
-                            if (!obs) return;
-                        
-                            // 1. Extract the Date
-                            const rawDate = obs.effectiveDateTime || obs.issued || (obs.effectivePeriod && obs.effectivePeriod.start);
-                            const dateLabel = rawDate ? new Date(rawDate).toLocaleDateString() : "No Date";
-                        
-                            // 2. Get the Name
-                            const name = obs.code?.text || obs.code?.coding?.[0]?.display || "Observation";
-                        
-                            let displayValue = "";
-                            
-                            // 3. Handle Values (using the "Universal" logic from before)
-                            if (obs.component) {
-                                displayValue = obs.component.map(c => {
-                                    const val = c.valueQuantity?.value || "N/A";
-                                    return `${val}`;
-                                }).join("/");
-                            } else {
-                                displayValue = obs.valueQuantity?.value || obs.valueString || "N/A";
-                            }
-                        
-                            const unit = obs.valueQuantity?.unit || "";
-                        
-                            // 4. THE FIX: Use the dateLabel here!
-                            const li = document.createElement('li');
-                            li.innerHTML = `<strong>[${dateLabel}] ${name}</strong>: ${displayValue} ${unit}`;
-                            list.appendChild(li);
-                        });
+data.entry.forEach(item => {
+    const obs = item.resource;
+    if (!obs) return;
+
+    // 1. Initialize the variable UP HERE so it's defined for the whole loop
+    let displayValue = "No Data"; 
+    const name = obs.code?.text || obs.code?.coding?.[0]?.display || "Observation";
+    const rawDate = obs.effectiveDateTime || obs.issued || (obs.effectivePeriod && obs.effectivePeriod.start);
+    const dateLabel = rawDate ? new Date(rawDate).toLocaleDateString() : "No Date";
+
+    // 2. Now fill the variable based on the data type
+    if (obs.component) {
+        displayValue = obs.component.map(c => {
+            const val = c.valueQuantity?.value || "N/A";
+            return val;
+        }).join("/");
+    } else {
+        // This checks numbers, text results, and coded results (Labs often use valueCodeableConcept)
+        displayValue = obs.valueQuantity?.value || 
+                       obs.valueString || 
+                       obs.valueCodeableConcept?.text || 
+                       "N/A";
+    }
+
+    const unit = obs.valueQuantity?.unit || "";
+
+    // 3. Now this line will work because displayValue is "in scope"
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>[${dateLabel}] ${name}</strong>: ${displayValue} ${unit}`;
+    list.appendChild(li);
+});
                         /*
                         data.entry.forEach(item => {
                             const obs = item.resource;
