@@ -82,6 +82,22 @@ drawChart(weightLabels.reverse(), weightValues.reverse());
                 // If not authorized, start the login flow
                 FHIR.oauth2.authorize(config);
             });
+
+function drawChart(labels, values) {
+    const ctx = document.getElementById('weightChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Weight Trend (kg/lbs)',
+                data: values,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        }
+    });
+}        
     </script>
 
 </body>
